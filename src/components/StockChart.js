@@ -1,7 +1,6 @@
 import React from "react";
 import { LineChart, Line, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-// Chart options
 const StockChart = ({ stockPriceData }) => {
     return (
         <ResponsiveContainer width="100%" height={400}>

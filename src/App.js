@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import debounce from 'lodash/debounce';
-import { Search, List } from 'semantic-ui-react'; // Import the Search and List components
+import { Search, List } from 'semantic-ui-react';
 import StockDetail from './components/StockDetail';
 import matches from './mocks/mockBestMatch';
 import mockStockDetail from './mocks/mockStockDetail'
@@ -16,11 +16,14 @@ const App = () => {
   const [stockChart, setStockChart] = useState(null);
   const [error, setError] = useState(null);
 
+  const refreshInterval = 60000;
+
+
   const debouncedSearch = debounce(async (searchQuery) => {
     try {
       setIsLoading(true);
       await new Promise((resolve, reject) => setTimeout(resolve, 100))
-      setSearchResults(matches.bestMatches || []); // Update searchResults
+      setSearchResults(matches.bestMatches || []);
       setError(null);
       setIsLoading(false);
     } catch (error) {
@@ -42,7 +45,7 @@ const App = () => {
        //await fetch(url);
       await new Promise((resolve, reject) => setTimeout(resolve, 100))
       //const data = await response.json();
-      setStockDetails(mockStockDetail); // Store the detailed stock information
+      setStockDetails(mockStockDetail);
       setError(null);
       setIsLoading(false);
     } catch (error) {
@@ -53,7 +56,6 @@ const App = () => {
   };
 
   const formatStockPriceData = (timeSeriesData) => {
-    console.log(timeSeriesData, 'timeSeriesData')
     const timestamps = Object.keys(timeSeriesData).reverse();
     const prices = timestamps.map((timestamp) => ({
       date: timestamp,
@@ -68,7 +70,6 @@ const App = () => {
       //const url = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${apiKey}`;
       //const response = await fetch(url);
       //const data = await response.json();
-      // Extract and format the stock price data for charting
       await new Promise((resolve, reject) => setTimeout(resolve, 100))
       const chartData = formatStockPriceData(timeSeriesMock['Time Series (Daily)']);
       setStockChart(chartData);
@@ -88,7 +89,18 @@ const App = () => {
     fetchTimeSeries(stockSymbol)
   }
 
-  // Custom result renderer for the Search component
+  useEffect(() => {
+    const refreshTimer = setInterval(() => {
+      if (stockDetail) {
+        fetchStockOverview(stockDetail.Symbol);
+      }
+    }, refreshInterval);
+
+    return () => {
+      clearInterval(refreshTimer);
+    };
+  }, [stockDetail]);
+
   const resultRenderer = (props) => {
     return (
       <List.Item>
@@ -122,6 +134,7 @@ const App = () => {
       <div className='app-body'>
         {stockDetail && <StockDetail stockDetail={stockDetail} /> }
         {stockChart && <StockChart stockPriceData={stockChart} />}
+        <div />
       </div>
       {error && <p>Error: {error}</p>}
     </div>

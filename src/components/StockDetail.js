@@ -11,7 +11,7 @@ const StockDetail = ({stockDetail}) => {
             <Card.Description>{stockDetail.Description.slice(0,100)}</Card.Description>
           </Card.Content>
           <Card.Content extra>
-            <div>Industry: {stockDetail.industry}</div>
+            <div>Industry: {stockDetail.Industry}</div>
             <div>PE Ratio: {stockDetail.PERatio}</div>
           </Card.Content>
         </Card>
@@ -19,4 +19,4 @@ const StockDetail = ({stockDetail}) => {
     )
 }
 
-export default StockDetail;
+export default React.memo(StockDetail);
